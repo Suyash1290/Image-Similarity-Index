@@ -1,0 +1,8 @@
+paths:
+  input_dir: ./input_images       # Directory containing input images
+  output_dir: ./output_clusters   # Directory to store clustered images
+  duplicates_log: ./database/duplicates.csv   # CSV file to log duplicate images
+  database_file: ./database/similarity.db     # SQLite database file for features
+
+storage:
+  temp_dir: /tmp/image_similarity_temp   # Temporary directory for intermediate files

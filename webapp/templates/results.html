@@ -1,0 +1,79 @@
+<!-- templates/results.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1>Analysis Results</h1>
+        
+        <!-- Clusters Section -->
+        <h2 class="mt-4">Image Clusters</h2>
+        {% if clusters %}
+            <p>Found {{ clusters|length }} unique image clusters.</p>
+            
+            <div class="row">
+                {% for cluster in clusters %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card cluster-card">
+                            <div class="card-header">
+                                <h5>{{ cluster.cluster_name }} ({{ cluster.count }} images)</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex flex-wrap">
+                                    {% for image in cluster.images %}
+                                        <div class="position-relative">
+                                            <a href="{{ url_for('cluster_file', cluster=cluster.cluster_name, filename=image) }}" target="_blank">
+                                                <img src="{{ url_for('cluster_file', cluster=cluster.cluster_name, filename=image) }}" 
+                                                     class="thumbnail" 
+                                                     alt="{{ image }}">
+                                            </a>
+                                            {% if loop.index == 1 %}
+                                                <span class="badge bg-primary position-absolute top-0 start-0">Primary</span>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">No image clusters found.</div>
+        {% endif %}
+        
+        <!-- Duplicates Section -->
+        <h2 class="mt-4">Duplicate Images</h2>
+        {% if duplicates %}
+            <p>Found {{ duplicates|length }} duplicate images.</p>
+            
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Original</th>
+                            <th>Duplicate</th>
+                            <th>Similarity Score</th>
+                            <th>Cosine Similarity</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for duplicate in duplicates %}
+                            <tr>
+                                <td>{{ duplicate.original.split('/')[-1] }}</td>
+                                <td>{{ duplicate.duplicate.split('/')[-1] }}</td>
+                                <td>{{ duplicate.similarity }}</td>
+                                <td>{{ duplicate.cosine_similarity }}</td>
+                                <td>{{ duplicate.timestamp }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">No duplicate images found.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

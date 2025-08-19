@@ -1,0 +1,153 @@
+<!-- templates/index.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1>Upload Images</h1>
+        <p class="lead">Upload multiple images to detect similarities and duplicates.</p>
+        
+        <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+            <div id="dropzone" class="dropzone">
+                <p>Drag and drop images here or click to select files</p>
+                <input type="file" id="file-input" name="files[]" multiple accept="image/*" style="display: none;">
+            </div>
+            
+            <div id="file-preview" class="row mb-3"></div>
+            
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Process Images</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Dropzone functionality
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
+    const filePreview = document.getElementById('file-preview');
+    const uploadForm = document.getElementById('upload-form');
+    const progressBar = document.querySelector('.progress');
+    const progressBarInner = document.querySelector('.progress-bar');
+    
+    // Open file dialog when clicking on dropzone
+    dropzone.addEventListener('click', () => {
+        fileInput.click();
+    });
+    
+    // Handle drag and drop events
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight() {
+        dropzone.classList.add('border-primary');
+    }
+    
+    function unhighlight() {
+        dropzone.classList.remove('border-primary');
+    }
+    
+    // Handle file drop
+    dropzone.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        fileInput.files = files;
+        updateFilePreview();
+    }
+    
+    // Handle file selection via input
+    fileInput.addEventListener('change', updateFilePreview);
+    
+    function updateFilePreview() {
+        filePreview.innerHTML = '';
+        const files = fileInput.files;
+        
+        if (files.length > 0) {
+            for (let i = 0; i < files.length; i++) {
+                if (files[i].type.startsWith('image/')) {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-2 col-4 mb-2';
+                    
+                    const img = document.createElement('img');
+                    img.className = 'img-thumbnail w-100';
+                    img.file = files[i];
+                    
+                    const reader = new FileReader();
+                    reader.onload = (function(aImg) { 
+                        return function(e) { 
+                            aImg.src = e.target.result; 
+                        }; 
+                    })(img);
+                    
+                    reader.readAsDataURL(files[i]);
+                    
+                    const fileInfo = document.createElement('div');
+                    fileInfo.className = 'small text-truncate';
+                    fileInfo.textContent = files[i].name;
+                    
+                    col.appendChild(img);
+                    col.appendChild(fileInfo);
+                    filePreview.appendChild(col);
+                }
+            }
+        }
+    }
+    
+    // Handle form submission with progress bar
+    uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        // Show progress bar
+        progressBar.style.display = 'flex';
+        
+        $.ajax({
+            url: '/upload',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            xhr: function() {
+                const xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        progressBarInner.style.width = percentComplete + '%';
+                        progressBarInner.textContent = Math.round(percentComplete) + '%';
+                    }
+                }, false);
+                return xhr;
+            },
+            success: function(response) {
+                window.location.href = '/results';
+            },
+            error: function(xhr, status, error) {
+                alert('Error uploading files: ' + error);
+                progressBar.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

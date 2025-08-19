@@ -1,0 +1,21 @@
+-- Schema for similarity database
+CREATE TABLE IF NOT EXISTS images (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    path TEXT UNIQUE,
+    phash BLOB,
+    histogram BLOB,
+    processed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS features (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    image_id INTEGER,
+    feature_vector BLOB,
+    FOREIGN KEY(image_id) REFERENCES images(id)
+);
+
+CREATE TABLE IF NOT EXISTS clusters (
+    cluster_id INTEGER,
+    image_id INTEGER,
+    FOREIGN KEY(image_id) REFERENCES images(id)
+);

@@ -1,0 +1,22 @@
+similarity:
+  thresholds:
+    phash: 0.85         # Threshold for perceptual hash similarity
+    histogram: 0.78     # Threshold for histogram similarity
+    structural: 0.65    # Threshold for structural similarity (SIFT/ORB)
+  weights:
+    color: 0.5          # Weight for color-based similarity
+    texture: 0.3        # Weight for texture-based similarity
+    shape: 0.2          # Weight for shape-based similarity
+  clustering:
+    method: hdbscan     # Clustering method (hdbscan or kmeans)
+    min_samples: 5      # Minimum samples per cluster (HDBSCAN)
+    eps: 0.5            # DBSCAN epsilon value
+
+performance:
+  batch_size: 512       # Number of images to process in one batch
+  max_workers: 8        # Maximum number of parallel workers
+  neon_enabled: true    # Enable NEON optimizations (true/false)
+  max_memory: 240       # Maximum memory usage in MB
+
+logging:
+  level: INFO           # Logging level (DEBUG, INFO, WARNING, ERROR)

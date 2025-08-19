@@ -1,0 +1,3 @@
+C:/Users/haris/OneDrive/Desktop/Image-Similarity-System/core/neon_optimized/build/CMakeFiles/INSTALL.dir
+C:/Users/haris/OneDrive/Desktop/Image-Similarity-System/core/neon_optimized/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/haris/OneDrive/Desktop/Image-Similarity-System/core/neon_optimized/build/CMakeFiles/ZERO_CHECK.dir
